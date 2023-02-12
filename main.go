@@ -11,10 +11,19 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
+
+type Book struct {
+	ID     primitive.ObjectID `bson:"_id,omitempty"`
+	Title  string             `bson:"title,omitempty"`
+	Author string             `bson:"author,omitempty"`
+	Tags   []string           `bson:"tags,omitempty"`
+	Pages  int                `bson:"pages,omitempty"`
+}
 
 func main() {
 	app := fiber.New()
@@ -28,6 +37,10 @@ func main() {
 		log.Fatal(err)
 	}
 	defer client.Disconnect(ctx)
+
+	database := client.Database("go-db")
+	bookCollection := database.Collection("books")
+
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
 		log.Fatal(err)
@@ -49,6 +62,18 @@ func main() {
 			"names": "Arvind",
 		})
 	})
+	books := Book{
+		Title:  "The Polyglot Developer",
+		Author: "Nic Raboy",
+		Tags:   []string{"development", "programming", "coding"},
+		Pages:  278,
+	}
+	// fmt.Println("List of books: ", books)
+	insertResult, err := bookCollection.InsertOne(ctx, books)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("List of books: ", insertResult.InsertedID)
 
 	app.Listen(getPort())
 }
