@@ -26,5 +26,11 @@ func main() {
 		})
 	})
 
+	app.Get("/getAllNames", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"names": "Arvind",
+		})
+	})
+
 	app.Listen(getPort())
 }
