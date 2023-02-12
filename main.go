@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -26,8 +27,12 @@ type Book struct {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	app := fiber.New()
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://Arvind:mongoConnection@go-cluster.sbelezr.mongodb.net/go-db?retryWrites=true&w=majority"))
+	client, err := mongo.NewClient(options.Client().ApplyURI(os.Getenv("MONGO_URI")))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,10 +68,10 @@ func main() {
 		})
 	})
 	books := Book{
-		Title:  "The Polyglot Developer",
-		Author: "Nic Raboy",
-		Tags:   []string{"development", "programming", "coding"},
-		Pages:  278,
+		Title:  "Atomic Habits",
+		Author: "James Clear",
+		Tags:   []string{"Personal Development"},
+		Pages:  306,
 	}
 	// fmt.Println("List of books: ", books)
 	insertResult, err := bookCollection.InsertOne(ctx, books)
