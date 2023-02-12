@@ -16,18 +16,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func getPort() string {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = ":3000"
-	} else {
-		port = ":" + port
-	}
-
-	return port
-}
-
 func main() {
+	app := fiber.New()
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://Arvind:mongoConnection@go-cluster.sbelezr.mongodb.net/go-db?retryWrites=true&w=majority"))
 	if err != nil {
 		log.Fatal(err)
@@ -48,8 +38,6 @@ func main() {
 	}
 	fmt.Println(databases)
 
-	app := fiber.New()
-
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"message": "Hello, Railway!",
@@ -63,4 +51,15 @@ func main() {
 	})
 
 	app.Listen(getPort())
+}
+
+func getPort() string {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = ":3000"
+	} else {
+		port = ":" + port
+	}
+
+	return port
 }
